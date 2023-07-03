@@ -2,3 +2,6 @@ THRIVE_key.txt
 key.txt
 SSH_key
 SSH_key.*
+__pycache__/
+.idea
+data/__pycache__/
