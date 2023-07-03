@@ -5,3 +5,4 @@ SSH_key.*
 __pycache__/
 .idea
 data/__pycache__/
+venv/
