@@ -11,7 +11,8 @@ the file should be in the following format:
 }
 
 ## Installation:
-Mongo setup:
+
+###Mongo setup:
 1.	Install MongoDB on your PC 
 2.	Create virtual environment (venv): file -> settings -> project -> Python Interpreter -> Add Interpreter -> Virtualenv Environment
 	Now when opening the project it should be opened with (venv) prompt.
@@ -21,11 +22,11 @@ For more info:
 https://youtu.be/rlvGCTE4MI0
 
 
-OpenAI setup:
+###OpenAI setup:
 In the terminal window:
 pip install openai
 
-BeautifulSoup Setup:
+###BeautifulSoup Setup:
 1.	Open File > Settings > Project from the PyCharm menu.
 2.	Select your current project.
 3.	Click the Python Interpreter tab within your project tab.
