@@ -5,9 +5,9 @@ Makes usage of chatGPT to generate the questions.
 Add openai_credentials.json file with the chatGPT credentials to the root folder in order to run the app.
 the file should be in the following format:
 {
-  "account_handle": "<email address>",
-  "password": "<passwod>",
-  "api_key": "<the OpenAI key>"
+  "account_handle": <email address>,
+  "password": <passwod>,
+  "api_key": <OpenAI key>
 }
 
 ## Installation:
