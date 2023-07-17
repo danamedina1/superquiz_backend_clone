@@ -12,15 +12,15 @@ def generate_mcq_list(url, number_of_questions = 10):
 
 
 
-#read the database with optional filters: id, no, url, tags. returns a list of MCQuestions
-def read(id = None, no = None, url = None, tags = None):
-    mcq_list = list(mongo_api.read_db(id, no, url, tags))
+#read the database with optional filters: id, url, tags. returns a list of MCQuestions
+def read(id = None, url = None, tags = None):
+    mcq_list = list(mongo_api.read_db(id, url, tags))
     [print(mcq) for mcq in mcq_list]
     return mcq_list
 
 
 #update an mcq document in the db with optional fields.
-def update(id = None, no = None, updated_mcq=None, updated_question=None, updated_answers=None, updated_correct_answer=None, updated_quote=None, updated_url=None, updated_tags=None, updated_date=None, updated_type=None):
+def update(id = None, updated_mcq=None, updated_question=None, updated_answers=None, updated_correct_answer=None, updated_quote=None, updated_url=None, updated_tags=None, updated_date=None, updated_type=None):
     if(updated_mcq == None):
         updated_mcq = {}#create an empty mcq to store the updated fields
 
@@ -43,13 +43,13 @@ def update(id = None, no = None, updated_mcq=None, updated_question=None, update
             updated_mcq['type'] = updated_type
 
     #update the mcq in the database:
-    result, msg = mongo_api.update_db(id, no, updated_mcq)
+    result, msg = mongo_api.update_db(id, updated_mcq)
     print(msg)
     return result
 
 #delete an mcq document from the db, selected by id or number.
 #If no id or number are provided, the function will return without deleting anything.
-def delete(id = None, no = None):
-    result, msg =  mongo_api.delete_db(id = id, no = no)
+def delete(id = None):
+    result, msg =  mongo_api.delete_db(id = id)
     print(msg)
     return result

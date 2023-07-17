@@ -49,10 +49,10 @@ def increase_db_counter():
 
 
 #read the database with optional filters:
-def read_db(id = None, no = None, url = None, tags = None):
+def read_db(id = None, url = None, tags = None):
     connect_db()#connect to the database
 
-    if(id == None and no == None):#if no id or no is specified, then filter by url and tags
+    if(id == None):#if no id is specified, then filter by url and tags
         if url == None and tags == None:#if no url or tags are specified, then return all
             results = MCQuestion.objects()
         elif url == None:#if no url is specified, then filter by tags
@@ -61,39 +61,28 @@ def read_db(id = None, no = None, url = None, tags = None):
             results = MCQuestion.objects(url = url)
         else:#if both url and tags are specified, then filter by both
             results = MCQuestion.objects(url = url, tags__all=tags)
-    else:#if id or no is specified, then filter by id or no
-        if id != None:#if id is specified, then filter by id
-            results = MCQuestion.objects(id=id)
-        else:#if no is specified, then filter by no
-            results = MCQuestion.objects(no=no)
-        # print the results:
+    else:#if id is specified, then filter by id or no
+        results = MCQuestion.objects(id=id)
 
     return results
 
 #update an mcq document in the database:
-def update_db(id = None, no = None, updated_mcq = None):
+def update_db(id = None, updated_mcq = None):
     connect_db()    #connect to the database
 
     if(id != None):#if id is specified, then filter by id and update the mcq document
         result =  MCQuestion.objects(id=id).update(**updated_mcq)
         return result, "Question id {id} updated in the database." if result else "Question id {id} not found in the database."
-    elif(no != None):#if no is specified, then filter by no and update the mcq document
-        result = MCQuestion.objects(no=no).update(**updated_mcq)
-        return result, "Question no. {no} updated in the database." if result else "Question no. {no} not found in the database."
-    else:#if neither id nor no is specified, return a message
-        return -1, "Please specify either an id or a question number to update a question in the database."
+    else:#if  id not specified, return a message
+        return -1, "Please specify an id to update a question in the database."
 
 
-#delete a document from the database, select by id or number:
-def delete_db(id = None, no = None):
+#delete a document from the database, select by id:
+def delete_db(id = None):
     connect_db()#connect to the database
 
     if(id != None):#if id is specified, then filter by id and delete the document
         result = MCQuestion.objects(id=id).delete()
         return result, f"Question id {id} deleted from the database." if result else f"Question id {id} not found in the database."
-    elif(no != None):#if no is specified, then filter by no and delete the document
-        result = MCQuestion.objects(no=no).delete()
-        #print(f"Question no. {no} deleted from the database.") if result else print(f"Question no. {no} not found in the database.")
-        return result, f"Question no. {no} deleted from the database." if result else f"Question no. {no} not found in the database."
-    else:#if neither id nor no is specified, return a message
-        return -1, "Please specify either an id or a question number to delete a question from the database."
+    else:#if id not specified, return a message
+        return -1, "Please specify an id to delete a question from the database."

@@ -7,3 +7,4 @@ __pycache__/
 data/__pycache__/
 venv/
 openai_credentials.json
+openai_credentials-THRIVE.json
