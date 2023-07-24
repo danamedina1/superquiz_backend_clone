@@ -56,7 +56,8 @@ def read_db(id = None, url = None, tags = None):
         if url == None and tags == None:#if no url or tags are specified, then return all
             results = MCQuestion.objects()
         elif url == None:#if no url is specified, then filter by tags
-            results = MCQuestion.objects(tags__all=tags)
+            # results = MCQuestion.objects(tags__all=tags)
+            results = MCQuestion.objects(tags__in=tags)
         elif tags == None:#if no tags are specified, then filter by url
             results = MCQuestion.objects(url = url)
         else:#if both url and tags are specified, then filter by both
@@ -69,13 +70,15 @@ def read_db(id = None, url = None, tags = None):
 #update an mcq document in the database:
 def update_db(id = None, updated_mcq = None):
     connect_db()    #connect to the database
-
-    if(id != None):#if id is specified, then filter by id and update the mcq document
-        result =  MCQuestion.objects(id=id).update(**updated_mcq)
-        return result, "Question id {id} updated in the database." if result else "Question id {id} not found in the database."
-    else:#if  id not specified, return a message
-        return -1, "Please specify an id to update a question in the database."
-
+    try:
+        if(id != None):#if id is specified, then filter by id and update the mcq document
+            result =  MCQuestion.objects(id=id).update(**updated_mcq)
+            return result, f"Question id {id} updated in the database." if result else f"Question id {id} not found in the database."
+        else:#if  id not specified, return a message
+            return None, "Please specify an id to update a question in the database."
+    except Exception as e:
+        print(f'Exception: {e}')
+        return None, f"Error updating question id {id} in the database. Received the following error: {e}"
 
 #delete a document from the database, select by id:
 def delete_db(id = None):

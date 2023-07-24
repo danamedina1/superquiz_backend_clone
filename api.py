@@ -1,7 +1,11 @@
 import data.mongo_setup as mongo_setup
 import chatgpt_api
 import mongo_api
-
+# from flask import Flask, request, jsonify
+#
+# app = Flask(__name__)
+#
+# @app.route('/generate_mcq', methods=['POST'])
 #create a new set of questions for a given url and store it in the DB:
 def generate_mcq_list(url, number_of_questions = 10):
     answer, tags, title = chatgpt_api.create_superquiz_questions(url, number_of_questions)
@@ -14,9 +18,10 @@ def generate_mcq_list(url, number_of_questions = 10):
 
 #read the database with optional filters: id, url, tags. returns a list of MCQuestions
 def read(id = None, url = None, tags = None):
-    mcq_list = list(mongo_api.read_db(id, url, tags))
+    result = mongo_api.read_db(id, url, tags)
+    mcq_list = list(result)
     [print(mcq) for mcq in mcq_list]
-    return mcq_list
+    return mcq_list, result
 
 
 #update an mcq document in the db with optional fields.
@@ -45,7 +50,7 @@ def update(id = None, updated_mcq=None, updated_question=None, updated_answers=N
     #update the mcq in the database:
     result, msg = mongo_api.update_db(id, updated_mcq)
     print(msg)
-    return result
+    return result, msg
 
 #delete an mcq document from the db, selected by id or number.
 #If no id or number are provided, the function will return without deleting anything.

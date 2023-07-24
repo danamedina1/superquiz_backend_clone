@@ -69,3 +69,20 @@ class MCQuestion(mongoengine.Document):
         printable_mcq += f'url: \t\t\t{self.url}\n'
 
         return printable_mcq
+
+    #convert the MCQuestion object to a dictionary:
+    def to_dict(self):
+        mcq_dict = {}
+        mcq_dict['id'] = str(self.id)
+        mcq_dict['name'] = self.name
+        mcq_dict['no'] = self.no
+        mcq_dict['date'] = self.date
+        mcq_dict['type'] = self.type
+        mcq_dict['tags'] = self.tags
+        mcq_dict['question'] = self.question
+        mcq_dict['answers'] = self.answers
+        mcq_dict['correct_answer'] = self.correct_answer
+        mcq_dict['quote'] = self.quote
+        mcq_dict['url'] = self.url
+
+        return mcq_dict
