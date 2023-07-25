@@ -49,21 +49,25 @@ def increase_db_counter():
 
 
 #read the database with optional filters:
-def read_db(id = None, url = None, tags = None):
-    connect_db()#connect to the database
+def read_db(id=None, url=None, tags=None, approved=None):
+    connect_db()  # Connect to the database
 
-    if(id == None):#if no id is specified, then filter by url and tags
-        if url == None and tags == None:#if no url or tags are specified, then return all
-            results = MCQuestion.objects()
-        elif url == None:#if no url is specified, then filter by tags
-            # results = MCQuestion.objects(tags__all=tags)
-            results = MCQuestion.objects(tags__in=tags)
-        elif tags == None:#if no tags are specified, then filter by url
-            results = MCQuestion.objects(url = url)
-        else:#if both url and tags are specified, then filter by both
-            results = MCQuestion.objects(url = url, tags__all=tags)
-    else:#if id is specified, then filter by id or no
-        results = MCQuestion.objects(id=id)
+    filters = {}
+
+    if id is not None:
+        filters['id'] = id
+
+    if url is not None:
+        filters['url'] = url
+
+    if tags is not None:
+        filters['tags__all'] = tags
+
+    # approved = parse_bool(approved)#####TO DELETE
+    if approved is not None:
+        filters['approved'] = approved
+
+    results = MCQuestion.objects(**filters)
 
     return results
 
@@ -86,6 +90,7 @@ def delete_db(id = None):
 
     if(id != None):#if id is specified, then filter by id and delete the document
         result = MCQuestion.objects(id=id).delete()
-        return result, f"Question id {id} deleted from the database." if result else f"Question id {id} not found in the database."
+        msg  = f"Question id {id} deleted from the database." if result else f"Question id {id} not found in the database."
+        return result, msg
     else:#if id not specified, return a message
-        return -1, "Please specify an id to delete a question from the database."
+        return 0, "Please specify an id to delete a question from the database."

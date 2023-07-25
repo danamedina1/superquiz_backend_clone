@@ -34,6 +34,8 @@ class MCQuestion(mongoengine.Document):
     correct_answer = mongoengine.StringField(required=True)
     quote = mongoengine.StringField(required=True)
     url = mongoengine.StringField(required=False)
+    approved = mongoengine.BooleanField(default=False)
+    approved_by = mongoengine.StringField(required=False)
 
     meta = {
         'db_alias': 'core',
@@ -49,6 +51,8 @@ class MCQuestion(mongoengine.Document):
             'correct_answer',
             'quote',
             'url',
+            'approved',
+            'approved_by'
         ],
         'ordering': ['-created']
     }
@@ -64,9 +68,11 @@ class MCQuestion(mongoengine.Document):
         printable_mcq += f'tags: \t\t\t{self.tags}\n'
         printable_mcq += f'question: \t\t{self.question}\n'
         printable_mcq += f'answers: \t\t{self.answers}\n'
-        printable_mcq += f'correct_answer: {self.correct_answer}\n'
+        printable_mcq += f'correct_answer: \t{self.correct_answer}\n'
         printable_mcq += f'quote: \t\t\t{self.quote}\n'
         printable_mcq += f'url: \t\t\t{self.url}\n'
+        printable_mcq += f'approved: \t\t{self.approved}\n'
+        printable_mcq += f'approved_by: \t\t{self.approved_by}\n'
 
         return printable_mcq
 
@@ -84,5 +90,7 @@ class MCQuestion(mongoengine.Document):
         mcq_dict['correct_answer'] = self.correct_answer
         mcq_dict['quote'] = self.quote
         mcq_dict['url'] = self.url
+        mcq_dict['approved'] = self.approved
+        mcq_dict['approved_by'] = self.approved_by
 
         return mcq_dict

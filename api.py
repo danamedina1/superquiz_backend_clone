@@ -1,60 +1,107 @@
-import data.mongo_setup as mongo_setup
-import chatgpt_api
-import mongo_api
-# from flask import Flask, request, jsonify
-#
-# app = Flask(__name__)
-#
-# @app.route('/generate_mcq', methods=['POST'])
-#create a new set of questions for a given url and store it in the DB:
-def generate_mcq_list(url, number_of_questions = 10):
-    answer, tags, title = chatgpt_api.create_superquiz_questions(url, number_of_questions)
-    mongo_setup.connect_db()
-    mcq_list =  mongo_api.gpt_output_to_mcq_list(answer, url, tags, title)
-    [print(mcq) for mcq in mcq_list]
-    return mcq_list
+from flask import Flask, request, jsonify
+import superquiz_app
+
+app = Flask(__name__)
+
+def string_to_list(string):
+    #trim the brackets and split the string into an array:
+    array = [element.strip() for element in string.strip('[').strip(']').split(',')]
+    #strip the whitespace from each element in the array:
+    # array = [element.strip() for element in array]
+    return array
+@app.route('/generate_mcq', methods=['POST'])
+def generate_mcq():
+    data = request.json
+    url = data.get('url')
+    number_of_questions = data.get('number_of_questions', 10)
+
+    # Input validation
+    if not url:
+        return jsonify({"error": "Missing 'url' parameter"}), 400
+
+    # Call generate_mcq_list function:
+    mcq_list = superquiz_app.generate_mcq_list(url, number_of_questions)
+
+    # Convert MCQuestion objects to dictionaries
+    serializable_mcq_list = []
+    for mcq in mcq_list:
+        mcq_dict = mcq.to_dict()
+        serializable_mcq_list.append(mcq_dict)
+
+   # return as a json with status code 200 for successful response:
+    return jsonify(serializable_mcq_list), 200
+
+@app.route('/read', methods=['GET'])
+def get_mcq_list():
+    id = request.args.get('id')
+    url = request.args.get('url')
+    tags = request.args.get('tags[]')
+    approved = request.args.get('approved')
+
+    # Convert arrays from string to list:
+    tags = string_to_list(tags) if tags else None
+
+    # Call read function:
+    mcq_list = superquiz_app.read(id, url, tags, approved)
+
+    # Check if the result is None, indicating an error occurred
+    if mcq_list is None:
+        return jsonify({"message": "Error: MCQ not found"}), 404  # Not Found
+
+    # Convert MCQuestion objects to dictionaries
+    serializable_mcq_list = []
+    for mcq in mcq_list:
+        mcq_dict = mcq.to_dict()
+        serializable_mcq_list.append(mcq_dict)
+
+    # return as a json with status code 200 for successful response:
+    return jsonify(serializable_mcq_list), 200
+
+@app.route('/update', methods=['PUT'])
+def update_mcq():
+    data = request.args
+    id = data.get('id')
+    updated_question = data.get('updated_question')
+    updated_answers = data.get('updated_answers[]')
+    updated_correct_answer = data.get('updated_correct_answer')
+    updated_quote = data.get('updated_quote')
+    updated_url = data.get('updated_url')
+    updated_tags = data.get('updated_tags[]')
+    updated_date = data.get('updated_date')
+    updated_type = data.get('updated_type')
+    updated_approved = data.get('updated_approved')
+    updated_approved_by = data.get('updated_approved_by')
 
 
+    # Convert arrays from string to list:
+    updated_answers = string_to_list(updated_answers) if updated_answers else None
+    updated_tags = string_to_list(updated_tags) if updated_tags else None
 
-#read the database with optional filters: id, url, tags. returns a list of MCQuestions
-def read(id = None, url = None, tags = None):
-    result = mongo_api.read_db(id, url, tags)
-    mcq_list = list(result)
-    [print(mcq) for mcq in mcq_list]
-    return mcq_list, result
+    # Call update function:
+    result,msg = superquiz_app.update(id=id, updated_question=updated_question, updated_answers=updated_answers,
+                                      updated_correct_answer=updated_correct_answer, updated_quote=updated_quote,
+                                      updated_url=updated_url, updated_tags=updated_tags, updated_date=updated_date,
+                                      updated_type=updated_type, updated_approved=updated_approved,
+                                      updated_approved_by=updated_approved_by)
 
+    if result is not None:
+        return jsonify({"result": result, "message": msg}), 200
+    else:
+        return jsonify({"message": msg}), 500
 
-#update an mcq document in the db with optional fields.
-def update(id = None, updated_mcq=None, updated_question=None, updated_answers=None, updated_correct_answer=None, updated_quote=None, updated_url=None, updated_tags=None, updated_date=None, updated_type=None):
-    if(updated_mcq == None):
-        updated_mcq = {}#create an empty mcq to store the updated fields
+@app.route('/delete', methods=['DELETE'])
+def delete_mcq():
+    id = request.args.get('id')
+    # Call delete function:
+    result, msg = superquiz_app.delete(id)
 
-        #add the updated fields to the mcq:
-        if(updated_question != None):
-            updated_mcq['question'] = updated_question
-        if(updated_answers != None):
-            updated_mcq['answers'] = updated_answers
-        if(updated_correct_answer != None):
-            updated_mcq['correct_answer'] = updated_correct_answer
-        if(updated_quote != None):
-            updated_mcq['quote'] = updated_quote
-        if(updated_url != None):
-            updated_mcq['url'] = updated_url
-        if(updated_tags != None):
-            updated_mcq['tags'] = updated_tags
-        if(updated_date != None):
-            updated_mcq['date'] = updated_date
-        if(updated_type != None):
-            updated_mcq['type'] = updated_type
+    # Check if the deletion was successful or not
+    if result != 1:
+        return jsonify({"message": msg}), 404  # Not Found
+    else:
+        # return as a json with status code 204 for successful deletion:
+        return jsonify({"message": msg}), 204
 
-    #update the mcq in the database:
-    result, msg = mongo_api.update_db(id, updated_mcq)
-    print(msg)
-    return result, msg
+if __name__ == '__main__':
+    app.run(debug=True)
 
-#delete an mcq document from the db, selected by id or number.
-#If no id or number are provided, the function will return without deleting anything.
-def delete(id = None):
-    result, msg =  mongo_api.delete_db(id = id)
-    print(msg)
-    return result
