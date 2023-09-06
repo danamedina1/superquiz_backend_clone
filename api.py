@@ -59,7 +59,7 @@ def get_mcq_list():
 
 @app.route('/update', methods=['PUT'])
 def update_mcq():
-    data = request.args
+    data = request.json
     id = data.get('id')
     updated_question = data.get('updated_question')
     updated_answers = data.get('updated_answers[]')

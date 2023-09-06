@@ -33,6 +33,7 @@ def load_openAI_credentials():
     return api_key
 
 
+
 #read KEY_FILE and return the key
 def chatGPT_read_key():
     global OPENAI_API_KEY
