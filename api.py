@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 import superquiz_app
 
-app = Flask('https://superquiz-v1-backend-fjicox52e-danamthriveprojectearth-gmailcom.vercel.app')
-
+app = Flask('__name__')
+#app = Flask('https://superquiz-v1-backend-fjicox52e-danamthriveprojectearth-gmailcom.vercel.app')
 def string_to_list(string):
     #trim the brackets and split the string into an array:
     array = [element.strip() for element in string.strip('[').strip(']').split(',')]
