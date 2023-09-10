@@ -1,8 +1,16 @@
 from flask import Flask, request, jsonify
 import superquiz_app
+import os
 
-#app = Flask('__name__')
-app = Flask('https://superquiz-v1-backend-fjicox52e-danamthriveprojectearth-gmailcom.vercel.app')
+app = Flask(__name__)
+
+# Check if the app is running on Vercel or locally
+if 'VERCEL_URL' in os.environ:
+    # If running on Vercel, use the Vercel configuration
+    app.config['BASE_URL'] = 'https://superquiz-v1-backend-fjicox52e-danamthriveprojectearth-gmailcom.vercel.app'
+else:
+    # If running locally, use the local configuration
+    app.config['BASE_URL'] = '__name__'
 def string_to_list(string):
     #trim the brackets and split the string into an array:
     array = [element.strip() for element in string.strip('[').strip(']').split(',')]
