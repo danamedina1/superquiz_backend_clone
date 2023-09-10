@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import superquiz_app
 import os
 
+print("Starting API server...")
 app = Flask(__name__)
 
 # Check if the app is running on Vercel or locally
